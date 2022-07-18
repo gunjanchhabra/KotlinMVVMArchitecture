@@ -23,8 +23,7 @@ class MainActivity : AppCompatActivity() {
         viewModel.getProductsList()
         binding.rvProducts.adapter = productsAdapter
 
-
-        viewModel.productList.observe(this, {
+        viewModel.productListState.observe(this,{
             it.let {
                 when (it.status) {
                     Status.LOADING -> {
@@ -43,5 +42,26 @@ class MainActivity : AppCompatActivity() {
                 }
             }
         })
+
+
+//        viewModel.productList.observe(this, {
+//            it.let {
+//                when (it.status) {
+//                    Status.LOADING -> {
+//                        binding.progressDialog.visibility = View.VISIBLE
+//                    }
+//                    Status.SUCCESS -> {
+//                        it.data?.let {
+//                            binding.progressDialog.visibility = View.GONE
+//                            productsAdapter.setProductList(it)
+//                        }
+//                    }
+//                    Status.ERROR -> {
+//                        binding.progressDialog.visibility = View.GONE
+//                        Toast.makeText(this, it.message, Toast.LENGTH_LONG).show()
+//                    }
+//                }
+//            }
+//        })
     }
 }

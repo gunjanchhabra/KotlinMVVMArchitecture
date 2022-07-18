@@ -3,6 +3,7 @@ package com.example.kotlinmvvmcode.viewmodel
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.example.kotlinmvvmcode.model.Products
 import com.example.kotlinmvvmcode.repository.ProductRepository
+import com.example.kotlinmvvmcode.usecase.ProductUseCase
 import com.example.kotlinmvvmcode.utils.ApiResponse
 import com.example.kotlinmvvmcode.utils.Constants
 import com.example.kotlinmvvmcode.utils.Status
@@ -36,7 +37,7 @@ class MainViewModelTest{
     lateinit var mainViewModel: MainViewModel
 
     @RelaxedMockK
-    lateinit var productRepository: ProductRepository
+    lateinit var productUseCase: ProductUseCase
 
     @get:Rule
     var rule: TestRule = InstantTaskExecutorRule()
@@ -45,7 +46,7 @@ class MainViewModelTest{
     fun setup() {
         MockKAnnotations.init(this,true)
         Dispatchers.setMain(testDispatcher)
-        mainViewModel = MainViewModel(productRepository)
+        mainViewModel = MainViewModel(productUseCase)
     }
 
     @After
@@ -55,12 +56,12 @@ class MainViewModelTest{
 
     @Test
     fun getProductsList() {
-        coEvery { productRepository.fetchProducts(Constants.BRAND_NAME) } returns Response.success(
+        coEvery { productUseCase.invoke(Constants.BRAND_NAME) } returns Response.success(
             Products()
         )
         runBlocking {
             mainViewModel.getProductsList()
-            assertEquals(ApiResponse(Status.SUCCESS, Products(), null), mainViewModel.productList.value)
+            assertEquals(ApiResponse(Status.SUCCESS, Products(), null), mainViewModel.productListState.value)
 
         }
     }
@@ -74,13 +75,13 @@ class MainViewModelTest{
             .request(Request.Builder().url(Constants.BASE_URL).build())
             .build()
 
-        coEvery { productRepository.fetchProducts(Constants.BRAND_NAME) } returns Response.error(
+        coEvery { productUseCase.invoke(Constants.BRAND_NAME) } returns Response.error(
             ResponseBody.create(
                 MediaType.parse("application/json"),"{\"message\":[\"Error\"]}"),response
         )
         runBlocking {
             mainViewModel.getProductsList()
-            assertEquals(ApiResponse(Status.ERROR,null,response.message()),mainViewModel.productList.value)
+            assertEquals(ApiResponse(Status.ERROR,null,response.message()),mainViewModel.productListState.value)
         }
     }
 }

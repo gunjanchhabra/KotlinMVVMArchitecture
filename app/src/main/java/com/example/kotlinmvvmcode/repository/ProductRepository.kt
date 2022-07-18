@@ -10,8 +10,6 @@ import javax.inject.Singleton
 @Singleton
 class ProductRepository @Inject constructor(val apiService: ApiService) {
     suspend fun fetchProducts(brandName : String): Response<Products> {
-        return withContext(Dispatchers.IO) {
-            apiService.getProducts(brandName)
-        }
+        return apiService.getProducts(brandName)
     }
 }

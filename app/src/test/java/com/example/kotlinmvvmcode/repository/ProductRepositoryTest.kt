@@ -16,9 +16,6 @@ import retrofit2.Response
 @RunWith(JUnit4::class)
 class ProductRepositoryTest{
     @RelaxedMockK
-    lateinit var productRepository: ProductRepository
-
-    @RelaxedMockK
     lateinit var apiService: ApiService
 
     @Before
@@ -29,8 +26,8 @@ class ProductRepositoryTest{
     @Test
     fun getAllProductsTest(){
         runBlocking {
-            coEvery { productRepository.fetchProducts(Constants.BRAND_NAME) } returns Response.success(Products())
-            val response = productRepository.fetchProducts(Constants.BRAND_NAME)
+            coEvery { apiService.getProducts(Constants.BRAND_NAME) } returns Response.success(Products())
+            val response = apiService.getProducts(Constants.BRAND_NAME)
             assertEquals(Products(),response.body())
         }
     }

@@ -5,18 +5,22 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.kotlinmvvmcode.model.Products
 import com.example.kotlinmvvmcode.repository.ProductRepository
+import com.example.kotlinmvvmcode.usecase.ProductUseCase
 import com.example.kotlinmvvmcode.utils.ApiResponse
 import com.example.kotlinmvvmcode.utils.Constants
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-class MainViewModel @Inject constructor(val repository: ProductRepository) : ViewModel() {
+class MainViewModel @Inject constructor(val productUseCase: ProductUseCase) : ViewModel() {
 
-    val productList = MutableLiveData<ApiResponse<Products>>()
+    private val productList = MutableLiveData<ApiResponse<Products>>()
+
+    val productListState : MutableLiveData<ApiResponse<Products>> get() = productList
+
     fun getProductsList() {
         productList.value = ApiResponse.loading(null)
         viewModelScope.launch {
-            val response = repository.fetchProducts(Constants.BRAND_NAME)
+            val response = productUseCase.invoke(Constants.BRAND_NAME)
             when {
                 response.isSuccessful -> {
                     val responseBody = response.body()
